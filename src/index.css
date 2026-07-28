@@ -1,82 +1,25 @@
-:root {
-  --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'Fira Code', ui-monospace, monospace;
+@import "tailwindcss";
 
-  --bg-dark: #07080c;
-  --bg-surface: #0d101a;
-  --bg-card: rgba(14, 17, 27, 0.75);
-  --bg-card-hover: rgba(22, 27, 42, 0.85);
-  --bg-glass: rgba(16, 18, 26, 0.85);
+@layer base {
+  :root {
+    --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'Fira Code', monospace;
+  }
 
-  --accent-cyan: #00f0ff;
-  --accent-purple: #a855f7;
-  --accent-emerald: #10b981;
-  --accent-rose: #f43f5e;
-  --accent-amber: #f59e0b;
-
-  --border-dim: rgba(255, 255, 255, 0.08);
-  --border-bright: rgba(0, 240, 255, 0.25);
-  --border-glow: rgba(0, 240, 255, 0.5);
-
-  --text-main: #f3f4f6;
-  --text-muted: #9ca3af;
-  --text-dim: #6b7280;
-  --text-inverse: #08060d;
-
-  --sidebar-width: 260px;
-  --header-height: 72px;
-  --min-viewport: 320px;
-  --max-viewport: 1440px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-full: 9999px;
-
-  --contain-reflow: layout paint inline-size;
-  --ease-kinetic: cubic-bezier(0.16, 1, 0.3, 1);
-  --shadow-neon-cyan: 0 0 25px rgba(0, 240, 255, 0.2);
-  --shadow-neon-purple: 0 0 25px rgba(168, 85, 247, 0.2);
-  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-
-  color-scheme: dark;
+  body {
+    background-color: #07080c;
+    color: #f3f4f6;
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  font-family: var(--font-sans);
-  font-size: 15px;
-  line-height: 1.6;
-  overflow-x: hidden;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: rgba(13, 16, 26, 0.8);
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 240, 255, 0.3);
-  border-radius: var(--radius-sm);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 240, 255, 0.6);
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  letter-spacing: -0.02em;
-  color: var(--text-main);
+.glass-panel {
+  background: rgba(13, 16, 26, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }

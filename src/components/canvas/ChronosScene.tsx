@@ -1,0 +1,209 @@
+import { useRef, useMemo, memo } from 'react'
+import { useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
+
+const ConstellationDust = memo(() => {
+  const count = 2000
+  const [positions, colors] = useMemo(() => {
+    const pos = new Float32Array(count * 3)
+    const col = new Float32Array(count * 3)
+    const cyan = new THREE.Color('#00f0ff')
+    const purple = new THREE.Color('#a855f7')
+    const emerald = new THREE.Color('#34d399')
+
+    for (let i = 0; i < count; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 28
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 28
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 28
+
+      const rand = Math.random()
+      const color = rand > 0.6 ? cyan : rand > 0.3 ? purple : emerald
+      col[i * 3] = color.r
+      col[i * 3 + 1] = color.g
+      col[i * 3 + 2] = color.b
+    }
+    return [pos, col]
+  }, [])
+
+  const pointsRef = useRef<THREE.Points>(null)
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime()
+    if (pointsRef.current) {
+      pointsRef.current.rotation.y = t * 0.02
+      pointsRef.current.rotation.x = Math.sin(t * 0.015) * 0.08
+    }
+  })
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.035}
+        vertexColors
+        transparent
+        opacity={0.7}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  )
+})
+
+const OrbitingSatellite = memo(({ radius, speed, color }: { radius: number; speed: number; color: string }) => {
+  const meshRef = useRef<THREE.Mesh>(null)
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime() * speed
+    if (meshRef.current) {
+      meshRef.current.position.x = Math.cos(t) * radius
+      meshRef.current.position.z = Math.sin(t) * radius
+      meshRef.current.position.y = Math.sin(t * 2) * 0.5
+    }
+  })
+
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[0.08, 16, 16]} />
+      <meshBasicMaterial color={color} />
+    </mesh>
+  )
+})
+
+const ChronosTimeLattice = memo(() => {
+  const groupRef = useRef<THREE.Group>(null)
+  const coreMeshRef = useRef<THREE.Mesh>(null)
+  const wireCoreRef = useRef<THREE.Mesh>(null)
+  const ring1Ref = useRef<THREE.Mesh>(null)
+  const ring2Ref = useRef<THREE.Mesh>(null)
+  const ring3Ref = useRef<THREE.Mesh>(null)
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime()
+
+    if (groupRef.current) {
+      groupRef.current.position.y = Math.sin(t * 0.8) * 0.15
+    }
+
+    if (coreMeshRef.current) {
+      coreMeshRef.current.rotation.x = t * 0.3
+      coreMeshRef.current.rotation.y = t * 0.4
+    }
+
+    if (wireCoreRef.current) {
+      wireCoreRef.current.rotation.x = -t * 0.5
+      wireCoreRef.current.rotation.z = t * 0.3
+    }
+
+    if (ring1Ref.current) {
+      ring1Ref.current.rotation.z = t * 0.35
+      ring1Ref.current.rotation.x = Math.sin(t * 0.4) * 0.4
+    }
+
+    if (ring2Ref.current) {
+      ring2Ref.current.rotation.z = -t * 0.25
+      ring2Ref.current.rotation.y = Math.cos(t * 0.3) * 0.5
+    }
+
+    if (ring3Ref.current) {
+      ring3Ref.current.rotation.x = t * 0.2
+      ring3Ref.current.rotation.z = Math.sin(t * 0.25) * 0.3
+    }
+  })
+
+  return (
+    <group ref={groupRef}>
+      {/* Central Floating Dodecahedron */}
+      <mesh ref={coreMeshRef}>
+        <dodecahedronGeometry args={[1.1, 0]} />
+        <meshPhysicalMaterial
+          color="#00f0ff"
+          emissive="#002b36"
+          roughness={0.1}
+          metalness={0.9}
+          clearcoat={1.0}
+          clearcoatRoughness={0.1}
+          reflectivity={0.95}
+        />
+      </mesh>
+
+      {/* Inner Glowing Wireframe Core */}
+      <mesh ref={wireCoreRef}>
+        <octahedronGeometry args={[1.5, 0]} />
+        <meshStandardMaterial
+          color="#a855f7"
+          emissive="#4c1d95"
+          wireframe
+          transparent
+          opacity={0.65}
+        />
+      </mesh>
+
+      {/* Ring 1 - Cyan Horizontal Orbital Axis */}
+      <mesh ref={ring1Ref}>
+        <torusGeometry args={[2.5, 0.025, 16, 120]} />
+        <meshStandardMaterial
+          color="#00f0ff"
+          emissive="#004d66"
+          roughness={0.1}
+          metalness={0.9}
+        />
+      </mesh>
+
+      {/* Ring 2 - Purple Tilted Orbital Axis */}
+      <mesh ref={ring2Ref}>
+        <torusGeometry args={[3.0, 0.02, 16, 120]} />
+        <meshStandardMaterial
+          color="#a855f7"
+          emissive="#581c87"
+          roughness={0.1}
+          metalness={0.9}
+        />
+      </mesh>
+
+      {/* Ring 3 - Emerald Outer Halo Ring */}
+      <mesh ref={ring3Ref}>
+        <torusGeometry args={[3.6, 0.015, 16, 120]} />
+        <meshStandardMaterial
+          color="#34d399"
+          emissive="#064e3b"
+          roughness={0.1}
+          metalness={0.9}
+        />
+      </mesh>
+
+      {/* Orbiting Satellite Lights */}
+      <OrbitingSatellite radius={2.5} speed={1.2} color="#00f0ff" />
+      <OrbitingSatellite radius={3.0} speed={-0.9} color="#a855f7" />
+      <OrbitingSatellite radius={3.6} speed={0.7} color="#34d399" />
+    </group>
+  )
+})
+
+export const ChronosScene = memo(() => {
+  const lightsRef = useRef<THREE.Group>(null)
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime()
+    if (lightsRef.current) {
+      lightsRef.current.rotation.y = t * 0.25
+    }
+  })
+
+  return (
+    <>
+      <ambientLight intensity={0.7} />
+
+      <group ref={lightsRef}>
+        <directionalLight position={[8, 6, 8]} intensity={2.2} color="#00f0ff" />
+        <pointLight position={[-8, -6, -8]} intensity={2.5} color="#a855f7" />
+        <pointLight position={[0, 8, -4]} intensity={1.8} color="#34d399" />
+      </group>
+
+      <ChronosTimeLattice />
+      <ConstellationDust />
+    </>
+  )
+})
