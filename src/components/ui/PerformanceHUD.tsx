@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, memo } from 'react'
 
-export const PerformanceHUD = () => {
+export const PerformanceHUD = memo(() => {
   const [fps, setFps] = useState(120)
   const [frameTimeMs, setFrameTimeMs] = useState(8.33)
   
   const frameCount = useRef(0)
-  const lastTime = useRef(performance.now())
+  const lastTime = useRef(0)
 
   useEffect(() => {
     let animId: number
+    lastTime.current = performance.now()
 
     const tick = () => {
       const now = performance.now()
@@ -38,7 +39,7 @@ export const PerformanceHUD = () => {
       <div className="flex items-center justify-between border-b border-white/10 pb-3">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
-          <h3 className="text-xs font-semibold tracking-wider text-white font-sans uppercase">
+          <h3 className="text-xs font-bold tracking-wider text-white font-heading uppercase">
             Performance Monitor
           </h3>
         </div>
@@ -76,4 +77,4 @@ export const PerformanceHUD = () => {
       </div>
     </div>
   )
-}
+})

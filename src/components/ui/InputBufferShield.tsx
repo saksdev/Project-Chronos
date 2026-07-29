@@ -1,6 +1,6 @@
-import { useState, type ChangeEvent } from 'react'
+import { useState, memo, type ChangeEvent } from 'react'
 
-export const InputBufferShield = () => {
+export const InputBufferShield = memo(() => {
   const [engineerId, setEngineerId] = useState('')
   const [commandPayload, setCommandPayload] = useState('')
   const [samplingRate, setSamplingRate] = useState(85)
@@ -22,7 +22,7 @@ export const InputBufferShield = () => {
       <div className="flex items-center justify-between border-b border-white/10 pb-4">
         <div className="flex items-center gap-2.5">
           <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f0ff]"></div>
-          <h2 className="text-sm font-semibold tracking-wider text-white font-sans uppercase">
+          <h2 className="text-sm font-bold tracking-wider text-white font-heading uppercase">
             Input Buffer Shield
           </h2>
         </div>
@@ -121,4 +121,4 @@ export const InputBufferShield = () => {
       </div>
     </div>
   )
-}
+})

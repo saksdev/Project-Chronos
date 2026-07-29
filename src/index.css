@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
-    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-    --font-mono: 'Fira Code', monospace;
-  }
+@theme {
+  --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, monospace;
+}
 
+@layer base {
   body {
     background-color: #07080c;
     color: #f3f4f6;
@@ -14,6 +14,10 @@
     overflow-x: hidden;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 }
 
