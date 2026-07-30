@@ -6,6 +6,7 @@ import { MobileDrawer } from './components/layout/MobileDrawer'
 import { Footer } from './components/layout/Footer'
 import { InputBufferShield } from './components/ui/InputBufferShield'
 import { PerformanceHUD } from './components/ui/PerformanceHUD'
+import { SettingsForm } from './components/ui/SettingsForm'
 import { SystemArchitecture } from './components/ui/SystemArchitecture'
 import './index.css'
 
@@ -48,6 +49,8 @@ export function App() {
               )}
 
               {activeTab === 'metrics' && <PerformanceHUD />}
+
+              {activeTab === 'settings' && <SettingsForm />}
 
               {activeTab === 'architecture' && <SystemArchitecture />}
             </div>

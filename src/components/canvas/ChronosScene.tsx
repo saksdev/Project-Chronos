@@ -2,8 +2,21 @@ import { useRef, useMemo, memo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
+const useElapsedTime = () => {
+  const startTime = useRef<number | null>(null)
+
+  return () => {
+    if (startTime.current === null) {
+      startTime.current = performance.now()
+    }
+    return (performance.now() - startTime.current) * 0.001
+  }
+}
+
 const ConstellationDust = memo(() => {
   const count = 2000
+  const getElapsedTime = useElapsedTime()
+
   const [positions, colors] = useMemo(() => {
     const pos = new Float32Array(count * 3)
     const col = new Float32Array(count * 3)
@@ -27,8 +40,8 @@ const ConstellationDust = memo(() => {
 
   const pointsRef = useRef<THREE.Points>(null)
 
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime()
+  useFrame(() => {
+    const t = getElapsedTime()
     if (pointsRef.current) {
       pointsRef.current.rotation.y = t * 0.02
       pointsRef.current.rotation.x = Math.sin(t * 0.015) * 0.08
@@ -54,9 +67,10 @@ const ConstellationDust = memo(() => {
 
 const OrbitingSatellite = memo(({ radius, speed, color }: { radius: number; speed: number; color: string }) => {
   const meshRef = useRef<THREE.Mesh>(null)
+  const getElapsedTime = useElapsedTime()
 
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime() * speed
+  useFrame(() => {
+    const t = getElapsedTime() * speed
     if (meshRef.current) {
       meshRef.current.position.x = Math.cos(t) * radius
       meshRef.current.position.z = Math.sin(t) * radius
@@ -79,9 +93,10 @@ const ChronosTimeLattice = memo(() => {
   const ring1Ref = useRef<THREE.Mesh>(null)
   const ring2Ref = useRef<THREE.Mesh>(null)
   const ring3Ref = useRef<THREE.Mesh>(null)
+  const getElapsedTime = useElapsedTime()
 
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime()
+  useFrame(() => {
+    const t = getElapsedTime()
 
     if (groupRef.current) {
       groupRef.current.position.y = Math.sin(t * 0.8) * 0.15
@@ -184,9 +199,10 @@ const ChronosTimeLattice = memo(() => {
 
 export const ChronosScene = memo(() => {
   const lightsRef = useRef<THREE.Group>(null)
+  const getElapsedTime = useElapsedTime()
 
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime()
+  useFrame(() => {
+    const t = getElapsedTime()
     if (lightsRef.current) {
       lightsRef.current.rotation.y = t * 0.25
     }

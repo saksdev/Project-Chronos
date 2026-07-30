@@ -13,6 +13,7 @@ export const MobileDrawer = memo(({ isOpen, onClose, activeTab, setActiveTab }: 
   const navItems = [
     { id: 'shield', label: 'Input Buffer Shield' },
     { id: 'metrics', label: 'Performance Monitor' },
+    { id: 'settings', label: 'Settings Panel' },
     { id: 'architecture', label: 'System Architecture' },
   ]
 

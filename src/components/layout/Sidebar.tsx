@@ -9,11 +9,12 @@ export const Sidebar = memo(({ activeTab, setActiveTab }: SidebarProps) => {
   const navItems = [
     { id: 'shield', label: 'Input Buffer Shield' },
     { id: 'metrics', label: 'Performance Monitor' },
+    { id: 'settings', label: 'Settings Panel' },
     { id: 'architecture', label: 'System Architecture' },
   ]
 
   return (
-    <aside className="w-[260px] h-full bg-[#0d1222]/80 backdrop-blur-xl border-r border-white/10 flex flex-col justify-between p-4 shadow-xl select-none shrink-0 overflow-y-auto">
+    <aside className="w-[260px] h-full bg-[#0d1222]/80 backdrop-blur-xl border-r border-white/10 flex flex-col justify-between p-5 shadow-xl select-none shrink-0 overflow-y-auto">
       <div className="space-y-6">
         <div className="px-2 pt-2">
           <span className="text-[10px] font-mono uppercase tracking-wider text-gray-500 block">
@@ -21,7 +22,7 @@ export const Sidebar = memo(({ activeTab, setActiveTab }: SidebarProps) => {
           </span>
         </div>
 
-        <nav className="space-y-1.5">
+        <nav className="space-y-2">
           {navItems.map((item) => {
             const isActive = activeTab === item.id
             return (
@@ -29,7 +30,7 @@ export const Sidebar = memo(({ activeTab, setActiveTab }: SidebarProps) => {
                 key={item.id}
                 type="button"
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-mono font-medium transition-all text-left cursor-pointer ${
+                className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-mono font-medium transition-all text-left cursor-pointer ${
                   isActive
                     ? 'bg-cyan-500/15 border border-cyan-500/40 text-cyan-400 shadow-[0_0_12px_rgba(0,240,255,0.2)]'
                     : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
