@@ -1,4 +1,8 @@
 import { useState, memo, type ChangeEvent } from 'react'
+import { useAppStore } from '../../store/useAppStore'
+import { CustomSlider } from './CustomSlider'
+import { ToggleSwitch } from './ToggleSwitch'
+import { TooltipOverlay } from './TooltipOverlay'
 
 interface ProfileOption {
   id: string
@@ -14,11 +18,17 @@ const PROFILES: ProfileOption[] = [
 ]
 
 export const SettingsForm = memo(() => {
-  const [targetFps, setTargetFps] = useState(120)
-  const [cameraFov, setCameraFov] = useState(48)
-  const [renderScale, setRenderScale] = useState(1.5)
-  const [vsyncEnabled, setVsyncEnabled] = useState(true)
-  const [enableHardwareAccel, setEnableHardwareAccel] = useState(true)
+  const targetFps = useAppStore((s) => s.targetFps)
+  const setTargetFps = useAppStore((s) => s.setTargetFps)
+  const cameraFov = useAppStore((s) => s.cameraFov)
+  const setCameraFov = useAppStore((s) => s.setCameraFov)
+  const renderScale = useAppStore((s) => s.renderScale)
+  const setRenderScale = useAppStore((s) => s.setRenderScale)
+  const vsyncEnabled = useAppStore((s) => s.vsyncEnabled)
+  const setVsyncEnabled = useAppStore((s) => s.setVsyncEnabled)
+  const hardwareAccel = useAppStore((s) => s.hardwareAccel)
+  const setHardwareAccel = useAppStore((s) => s.setHardwareAccel)
+
   const [selectedProfile, setSelectedProfile] = useState('ultra')
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
@@ -31,10 +41,6 @@ export const SettingsForm = memo(() => {
 
   const handleFovChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCameraFov(Number(e.target.value))
-  }
-
-  const handleRenderScaleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setRenderScale(Number(e.target.value))
   }
 
   const handleSelectProfile = (profile: ProfileOption) => {
@@ -53,19 +59,22 @@ export const SettingsForm = memo(() => {
         <div className="flex items-center gap-2.5">
           <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f0ff]"></div>
           <h2 className="text-sm font-bold tracking-wider text-white font-heading uppercase">
-            Engine Settings & Validation
+            Engine Settings & Context Helpers
           </h2>
         </div>
         <span className="px-3 py-1 text-[10px] font-mono rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-medium">
-          Validated State
+          Tooltips Active
         </span>
       </div>
 
       <div className="space-y-4">
         <div className="relative">
-          <label className="block text-[11px] font-mono text-gray-400 mb-1.5 uppercase tracking-wider">
-            Performance Profile Preset
-          </label>
+          <div className="flex items-center mb-1.5">
+            <label className="block text-[11px] font-mono text-gray-400 uppercase tracking-wider">
+              Performance Profile Preset
+            </label>
+            <TooltipOverlay content="Pre-configured target frame-rate and render scale multiplier settings." />
+          </div>
           <button
             type="button"
             onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -99,7 +108,10 @@ export const SettingsForm = memo(() => {
 
         <div>
           <div className="flex justify-between text-[11px] font-mono text-gray-400 mb-1.5">
-            <span className="uppercase tracking-wider">Target Refresh Benchmark</span>
+            <div className="flex items-center">
+              <span className="uppercase tracking-wider">Target Refresh Benchmark</span>
+              <TooltipOverlay content="Defines target GPU frame rendering rate limit (30-240 FPS)." />
+            </div>
             <div className="flex items-center gap-2">
               <span className="text-cyan-400 font-bold">{targetFps} FPS</span>
               <span
@@ -130,7 +142,10 @@ export const SettingsForm = memo(() => {
 
         <div>
           <div className="flex justify-between text-[11px] font-mono text-gray-400 mb-1.5">
-            <span className="uppercase tracking-wider">Camera FOV Lens Angle</span>
+            <div className="flex items-center">
+              <span className="uppercase tracking-wider">Camera FOV Lens Angle</span>
+              <TooltipOverlay content="Adjusts 3D perspective camera field of view angle (30°-120°)." />
+            </div>
             <div className="flex items-center gap-2">
               <span className="text-cyan-400 font-bold">{cameraFov}°</span>
               <span
@@ -159,66 +174,43 @@ export const SettingsForm = memo(() => {
           />
         </div>
 
-        <div>
-          <div className="flex justify-between text-[11px] font-mono text-gray-400 mb-1.5">
-            <span className="uppercase tracking-wider">Render Scale Multiplier</span>
-            <span className="text-cyan-400 font-bold">{renderScale.toFixed(1)}x</span>
-          </div>
-          <input
-            id="render-scale"
-            type="range"
-            min="0.5"
-            max="2.0"
-            step="0.1"
-            value={renderScale}
-            onChange={handleRenderScaleChange}
-            className="w-full accent-cyan-400 cursor-pointer h-1.5 bg-gray-800 rounded-lg"
+        <CustomSlider
+          label="Render Scale Multiplier"
+          min={0.5}
+          max={2.0}
+          step={0.1}
+          value={renderScale}
+          unit="x"
+          tooltip="Adjusts internal WebGL render resolution scale multiplier."
+          onChange={setRenderScale}
+        />
+
+        <div className="pt-2 border-t border-white/10 space-y-2">
+          <ToggleSwitch
+            label="VSync Lock Simulation"
+            enabled={vsyncEnabled}
+            onToggle={setVsyncEnabled}
+            activeColor="cyan"
+            tooltip="Synchronizes rendering cycles with target screen refresh rate."
           />
-        </div>
 
-        <div className="flex items-center justify-between pt-2 border-t border-white/10">
-          <span className="text-[11px] font-mono text-gray-400 uppercase tracking-wider">
-            VSync Lock Simulation
-          </span>
-          <button
-            type="button"
-            onClick={() => setVsyncEnabled(!vsyncEnabled)}
-            className={`px-3.5 py-1.5 text-xs font-mono rounded-lg font-medium transition-all cursor-pointer ${
-              vsyncEnabled
-                ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30'
-                : 'bg-gray-800/80 text-gray-400 border border-gray-700'
-            }`}
-          >
-            {vsyncEnabled ? 'LOCKED' : 'UNLOCKED'}
-          </button>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] font-mono text-gray-400 uppercase tracking-wider">
-            GPU Acceleration Pipeline
-          </span>
-          <button
-            type="button"
-            onClick={() => setEnableHardwareAccel(!enableHardwareAccel)}
-            className={`px-3.5 py-1.5 text-xs font-mono rounded-lg font-medium transition-all cursor-pointer ${
-              enableHardwareAccel
-                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
-                : 'bg-gray-800/80 text-gray-400 border border-gray-700'
-            }`}
-          >
-            {enableHardwareAccel ? 'ACTIVE' : 'DISABLED'}
-          </button>
+          <ToggleSwitch
+            label="GPU Acceleration Pipeline"
+            enabled={hardwareAccel}
+            onToggle={setHardwareAccel}
+            activeColor="emerald"
+            tooltip="Enables WebGL hardware acceleration pipeline for smooth 120 FPS rendering."
+          />
         </div>
       </div>
 
       <div className="pt-3 border-t border-white/10 font-mono text-xs space-y-2">
         <span className="text-[10px] text-gray-400 uppercase tracking-wider block">
-          Validation & Telemetry Status:
+          Context Helper Telemetry:
         </span>
         <div className="p-3 bg-[#07080c]/90 rounded-xl border border-white/5 text-[11px] text-gray-300 space-y-1">
-          <div>Profile: <span className="text-cyan-400 font-bold uppercase">{selectedProfile}</span></div>
-          <div>FPS Status: <span className={isFpsValid ? 'text-emerald-400' : 'text-rose-400'}>{isFpsValid ? 'VALID (30-240)' : 'INVALID'}</span></div>
-          <div>FOV Status: <span className={isFovValid ? 'text-emerald-400' : 'text-rose-400'}>{isFovValid ? 'VALID (30-120)' : 'INVALID'}</span></div>
+          <div>Tooltips: <span className="text-cyan-400 font-bold uppercase">5 Active Helpers</span></div>
+          <div>Field Micro-Copy: <span className="text-emerald-400 font-bold">Hover Popovers Ready</span></div>
         </div>
       </div>
     </form>

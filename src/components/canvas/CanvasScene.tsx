@@ -1,4 +1,4 @@
-import { useRef, useMemo, memo } from 'react'
+import { useRef, memo } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -13,31 +13,31 @@ const useElapsedTime = () => {
   }
 }
 
+const generateConstellationData = (count: number) => {
+  const pos = new Float32Array(count * 3)
+  const col = new Float32Array(count * 3)
+  const cyan = new THREE.Color('#00f0ff')
+  const purple = new THREE.Color('#a855f7')
+  const emerald = new THREE.Color('#34d399')
+
+  for (let i = 0; i < count; i++) {
+    pos[i * 3] = (Math.random() - 0.5) * 28
+    pos[i * 3 + 1] = (Math.random() - 0.5) * 28
+    pos[i * 3 + 2] = (Math.random() - 0.5) * 28
+
+    const rand = Math.random()
+    const color = rand > 0.6 ? cyan : rand > 0.3 ? purple : emerald
+    col[i * 3] = color.r
+    col[i * 3 + 1] = color.g
+    col[i * 3 + 2] = color.b
+  }
+  return { pos, col }
+}
+
+const CONSTELLATION_DATA = generateConstellationData(2000)
+
 const ConstellationDust = memo(() => {
-  const count = 2000
   const getElapsedTime = useElapsedTime()
-
-  const [positions, colors] = useMemo(() => {
-    const pos = new Float32Array(count * 3)
-    const col = new Float32Array(count * 3)
-    const cyan = new THREE.Color('#00f0ff')
-    const purple = new THREE.Color('#a855f7')
-    const emerald = new THREE.Color('#34d399')
-
-    for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 28
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 28
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 28
-
-      const rand = Math.random()
-      const color = rand > 0.6 ? cyan : rand > 0.3 ? purple : emerald
-      col[i * 3] = color.r
-      col[i * 3 + 1] = color.g
-      col[i * 3 + 2] = color.b
-    }
-    return [pos, col]
-  }, [])
-
   const pointsRef = useRef<THREE.Points>(null)
 
   useFrame(() => {
@@ -51,8 +51,8 @@ const ConstellationDust = memo(() => {
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
+        <bufferAttribute attach="attributes-position" args={[CONSTELLATION_DATA.pos, 3]} />
+        <bufferAttribute attach="attributes-color" args={[CONSTELLATION_DATA.col, 3]} />
       </bufferGeometry>
       <pointsMaterial
         size={0.035}
@@ -86,7 +86,7 @@ const OrbitingSatellite = memo(({ radius, speed, color }: { radius: number; spee
   )
 })
 
-const ChronosTimeLattice = memo(() => {
+const TimeLattice = memo(() => {
   const groupRef = useRef<THREE.Group>(null)
   const coreMeshRef = useRef<THREE.Mesh>(null)
   const wireCoreRef = useRef<THREE.Mesh>(null)
@@ -130,7 +130,6 @@ const ChronosTimeLattice = memo(() => {
 
   return (
     <group ref={groupRef}>
-      {/* Central Floating Dodecahedron */}
       <mesh ref={coreMeshRef}>
         <dodecahedronGeometry args={[1.1, 0]} />
         <meshPhysicalMaterial
@@ -144,7 +143,6 @@ const ChronosTimeLattice = memo(() => {
         />
       </mesh>
 
-      {/* Inner Glowing Wireframe Core */}
       <mesh ref={wireCoreRef}>
         <octahedronGeometry args={[1.5, 0]} />
         <meshStandardMaterial
@@ -156,7 +154,6 @@ const ChronosTimeLattice = memo(() => {
         />
       </mesh>
 
-      {/* Ring 1 - Cyan Horizontal Orbital Axis */}
       <mesh ref={ring1Ref}>
         <torusGeometry args={[2.5, 0.025, 16, 120]} />
         <meshStandardMaterial
@@ -167,7 +164,6 @@ const ChronosTimeLattice = memo(() => {
         />
       </mesh>
 
-      {/* Ring 2 - Purple Tilted Orbital Axis */}
       <mesh ref={ring2Ref}>
         <torusGeometry args={[3.0, 0.02, 16, 120]} />
         <meshStandardMaterial
@@ -178,7 +174,6 @@ const ChronosTimeLattice = memo(() => {
         />
       </mesh>
 
-      {/* Ring 3 - Emerald Outer Halo Ring */}
       <mesh ref={ring3Ref}>
         <torusGeometry args={[3.6, 0.015, 16, 120]} />
         <meshStandardMaterial
@@ -189,7 +184,6 @@ const ChronosTimeLattice = memo(() => {
         />
       </mesh>
 
-      {/* Orbiting Satellite Lights */}
       <OrbitingSatellite radius={2.5} speed={1.2} color="#00f0ff" />
       <OrbitingSatellite radius={3.0} speed={-0.9} color="#a855f7" />
       <OrbitingSatellite radius={3.6} speed={0.7} color="#34d399" />
@@ -197,7 +191,7 @@ const ChronosTimeLattice = memo(() => {
   )
 })
 
-export const ChronosScene = memo(() => {
+export const CanvasScene = memo(() => {
   const lightsRef = useRef<THREE.Group>(null)
   const getElapsedTime = useElapsedTime()
 
@@ -218,7 +212,7 @@ export const ChronosScene = memo(() => {
         <pointLight position={[0, 8, -4]} intensity={1.8} color="#34d399" />
       </group>
 
-      <ChronosTimeLattice />
+      <TimeLattice />
       <ConstellationDust />
     </>
   )
