@@ -38,14 +38,11 @@ export const SettingsForm = memo(() => {
   const isFovValid = cameraFov >= 30 && cameraFov <= 120
 
   useEffect(() => {
-    const unsub = useAppStore.subscribe(
-      (state) => state.renderScale,
-      (newScale) => {
-        if (scaleBadgeRef.current) {
-          scaleBadgeRef.current.innerText = `${newScale.toFixed(1)}x`
-        }
+    const unsub = useAppStore.subscribe((state) => {
+      if (scaleBadgeRef.current) {
+        scaleBadgeRef.current.innerText = `${state.renderScale.toFixed(1)}x`
       }
-    )
+    })
     return () => unsub()
   }, [])
 
