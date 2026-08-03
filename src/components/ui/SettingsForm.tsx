@@ -1,4 +1,4 @@
-import { useState, memo, type ChangeEvent } from 'react'
+import { useState, useEffect, useRef, memo, type ChangeEvent } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import { CustomSlider } from './CustomSlider'
 import { ToggleSwitch } from './ToggleSwitch'
@@ -28,12 +28,26 @@ export const SettingsForm = memo(() => {
   const setVsyncEnabled = useAppStore((s) => s.setVsyncEnabled)
   const hardwareAccel = useAppStore((s) => s.hardwareAccel)
   const setHardwareAccel = useAppStore((s) => s.setHardwareAccel)
+  const resetSettings = useAppStore((s) => s.resetSettings)
 
   const [selectedProfile, setSelectedProfile] = useState('ultra')
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
+  const scaleBadgeRef = useRef<HTMLSpanElement>(null)
   const isFpsValid = targetFps >= 30 && targetFps <= 240
   const isFovValid = cameraFov >= 30 && cameraFov <= 120
+
+  useEffect(() => {
+    const unsub = useAppStore.subscribe(
+      (state) => state.renderScale,
+      (newScale) => {
+        if (scaleBadgeRef.current) {
+          scaleBadgeRef.current.innerText = `${newScale.toFixed(1)}x`
+        }
+      }
+    )
+    return () => unsub()
+  }, [])
 
   const handleFpsChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTargetFps(Number(e.target.value))
@@ -59,12 +73,21 @@ export const SettingsForm = memo(() => {
         <div className="flex items-center gap-2.5">
           <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f0ff]"></div>
           <h2 className="text-sm font-bold tracking-wider text-white font-heading uppercase">
-            Engine Settings & Context Helpers
+            Engine Settings & Slices
           </h2>
         </div>
-        <span className="px-3 py-1 text-[10px] font-mono rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-medium">
-          Tooltips Active
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={resetSettings}
+            className="px-2.5 py-1 text-[10px] font-mono rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white transition-all cursor-pointer"
+          >
+            Reset Baseline
+          </button>
+          <span className="px-2.5 py-1 text-[10px] font-mono rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-medium">
+            Modular Slices
+          </span>
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -206,11 +229,12 @@ export const SettingsForm = memo(() => {
 
       <div className="pt-3 border-t border-white/10 font-mono text-xs space-y-2">
         <span className="text-[10px] text-gray-400 uppercase tracking-wider block">
-          Context Helper Telemetry:
+          Transient Direct Subscriber Telemetry:
         </span>
         <div className="p-3 bg-[#07080c]/90 rounded-xl border border-white/5 text-[11px] text-gray-300 space-y-1">
-          <div>Tooltips: <span className="text-cyan-400 font-bold uppercase">5 Active Helpers</span></div>
-          <div>Field Micro-Copy: <span className="text-emerald-400 font-bold">Hover Popovers Ready</span></div>
+          <div>Profile: <span className="text-cyan-400 font-bold uppercase">{selectedProfile}</span></div>
+          <div>Direct Sub Scale: <span ref={scaleBadgeRef} className="text-emerald-400 font-bold">{renderScale.toFixed(1)}x</span></div>
+          <div>Hardware Accel: <span className={hardwareAccel ? 'text-emerald-400' : 'text-gray-500'}>{hardwareAccel ? 'ACTIVE' : 'DISABLED'}</span></div>
         </div>
       </div>
     </form>
