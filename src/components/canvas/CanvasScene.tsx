@@ -1,5 +1,5 @@
 import { useRef, useEffect, memo } from 'react'
-import { useFrame, useThree } from '@react-three/fiber'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
 const useElapsedTime = () => {
@@ -193,9 +193,9 @@ const TimeLattice = memo(() => {
 
 export const CanvasScene = memo(() => {
   const lightsRef = useRef<THREE.Group>(null)
+  const parallaxGroupRef = useRef<THREE.Group>(null)
   const getElapsedTime = useElapsedTime()
   const mouseRef = useRef({ x: 0, y: 0 })
-  const { camera } = useThree()
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -214,12 +214,22 @@ export const CanvasScene = memo(() => {
       lightsRef.current.rotation.y = t * 0.25
     }
 
-    camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, mouseRef.current.y * 0.06, 0.05)
-    camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, -mouseRef.current.x * 0.06, 0.05)
+    if (parallaxGroupRef.current) {
+      parallaxGroupRef.current.rotation.x = THREE.MathUtils.lerp(
+        parallaxGroupRef.current.rotation.x,
+        mouseRef.current.y * 0.06,
+        0.05
+      )
+      parallaxGroupRef.current.rotation.y = THREE.MathUtils.lerp(
+        parallaxGroupRef.current.rotation.y,
+        -mouseRef.current.x * 0.06,
+        0.05
+      )
+    }
   })
 
   return (
-    <>
+    <group ref={parallaxGroupRef}>
       <ambientLight intensity={0.7} />
 
       <group ref={lightsRef}>
@@ -230,6 +240,6 @@ export const CanvasScene = memo(() => {
 
       <TimeLattice />
       <ConstellationDust />
-    </>
+    </group>
   )
 })
