@@ -8,6 +8,7 @@ import { InputBufferShield } from './components/ui/InputBufferShield'
 import { PerformanceHUD } from './components/ui/PerformanceHUD'
 import { SettingsForm } from './components/ui/SettingsForm'
 import { SystemArchitecture } from './components/ui/SystemArchitecture'
+import { CustomCursor } from './components/ui/CustomCursor'
 import './index.css'
 
 export function App() {
@@ -16,8 +17,8 @@ export function App() {
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-[#07080c]">
-      {/* 3D WebGL Canvas Layer (Isolated Background Thread) */}
       <CanvasContainer />
+      <CustomCursor />
 
       <MobileDrawer
         isOpen={isMobileMenuOpen}

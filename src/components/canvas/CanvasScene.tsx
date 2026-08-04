@@ -1,5 +1,5 @@
-import { useRef, memo } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useRef, useEffect, memo } from 'react'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
 const useElapsedTime = () => {
@@ -194,12 +194,28 @@ const TimeLattice = memo(() => {
 export const CanvasScene = memo(() => {
   const lightsRef = useRef<THREE.Group>(null)
   const getElapsedTime = useElapsedTime()
+  const mouseRef = useRef({ x: 0, y: 0 })
+  const { camera } = useThree()
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mouseRef.current = {
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: -(e.clientY / window.innerHeight) * 2 + 1,
+      }
+    }
+    window.addEventListener('mousemove', handleMouseMove)
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
 
   useFrame(() => {
     const t = getElapsedTime()
     if (lightsRef.current) {
       lightsRef.current.rotation.y = t * 0.25
     }
+
+    camera.rotation.x = THREE.MathUtils.lerp(camera.rotation.x, mouseRef.current.y * 0.06, 0.05)
+    camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, -mouseRef.current.x * 0.06, 0.05)
   })
 
   return (

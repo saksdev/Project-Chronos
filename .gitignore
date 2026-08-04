@@ -7,12 +7,18 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Build and cache outputs
 node_modules
 dist
 dist-ssr
 *.local
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+tsconfig.app.tsbuildinfo
+tsconfig.node.tsbuildinfo
 
-*.husky
+# Husky hooks
+.husky
 
 # Editor directories and files
 .vscode/*
